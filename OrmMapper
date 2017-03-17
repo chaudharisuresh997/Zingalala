@@ -1,0 +1,78 @@
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class OrmMapper {
+	boolean[] checkInsert;
+	Map<String,String> contentValues=new HashMap<>();
+	List<String> s=new ArrayList<String>();
+	public void getMethods()
+	{
+		
+		s.add(0,"userName");
+		s.add(1,"passWord");
+		s.add(2,"schoolName");
+		//checkInsert=new boolean[s.size()];
+		User u=new User();
+		u.setUserName("user");
+		u.setPassWord(999);
+		u.setSchoolName("schoolName");
+		User u1=new User();
+		Method []methods;
+		methods=u.getClass().getMethods();
+		for(int i=0;i<methods.length;i++)
+		{
+		
+			if(methods[i].getName().contains("get"))
+			{
+				setValue(methods[i],u);
+			}
+		}
+		for (Map.Entry<String, String> entry : contentValues.entrySet()) {
+		    String key = entry.getKey();
+		    Object value = entry.getValue();
+		 System.out.println("key"+key+"  value"+value);   
+		}
+
+	}
+public void setValue(Method me,User u){
+	me.setAccessible(true);
+for(int i=0;i<s.size();i++)
+{
+	String methodName=me.getName().toLowerCase();
+	if(methodName.contains(s.get(i).toLowerCase())){
+		try {
+			//if(!checkInsert[i])
+			//{
+			String value=""+me.invoke(u);
+			contentValues.put(s.get(i),value);
+			//checkInsert[i]=true;
+			//}
+			
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+	
+}
+	public static void main(String[] args) {
+OrmMapper mapObj=new OrmMapper();
+mapObj.getMethods();
+		
+	}
+
+}
